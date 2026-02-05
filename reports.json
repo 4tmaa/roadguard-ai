@@ -1,0 +1,120 @@
+[
+    {
+        "id": "20260111_234323_4.prov_.jpg",
+        "waktu": "2026-01-11 23:43",
+        "lokasi": "Tanpa Lokasi",
+        "gambar": "static/uploads\\20260111_234323_4.prov_.jpg",
+        "hasil_ai": "Rusak Ringan",
+        "confidence": 50.0,
+        "priority_score": 2,
+        "status": "Selesai"
+    },
+    {
+        "id": "20260111_234344_4.prov_.jpg",
+        "waktu": "2026-01-11 23:43",
+        "lokasi": "Amikom",
+        "gambar": "static/uploads\\20260111_234344_4.prov_.jpg",
+        "hasil_ai": "Rusak Ringan",
+        "confidence": 50.0,
+        "priority_score": 2,
+        "status": "Selesai"
+    },
+    {
+        "id": "20260111_234441_1739757991209.png",
+        "waktu": "2026-01-11 23:44",
+        "lokasi": "KLaten",
+        "gambar": "static/uploads\\20260111_234441_1739757991209.png",
+        "hasil_ai": "Rusak Berat",
+        "confidence": 58.900001525878906,
+        "priority_score": 3,
+        "status": "Selesai"
+    },
+    {
+        "id": "20260111_234516_Jalan Nasional_20250520.webp",
+        "waktu": "2026-01-11 23:45",
+        "lokasi": "Jl. Pemuda Sel, Mlinjon, Tonggalan, Kec. Klaten Tengah, Kabupaten Klaten, Jawa Tengah",
+        "gambar": "static/uploads\\20260111_234516_Jalan Nasional_20250520.webp",
+        "hasil_ai": "Normal",
+        "confidence": 95.4000015258789,
+        "priority_score": 1,
+        "status": "Selesai"
+    },
+    {
+        "id": "20260112_011915_waspada-jalan-berlubang-di-jalur-pantura-intai-pengendara-N8eBjPWXLg.jpg",
+        "waktu": "2026-01-12 01:19",
+        "lokasi": "Amikom",
+        "gambar": "static/uploads\\20260112_011915_waspada-jalan-berlubang-di-jalur-pantura-intai-pengendara-N8eBjPWXLg.jpg",
+        "hasil_ai": "Rusak Berat",
+        "confidence": 59.900001525878906,
+        "priority_score": 3,
+        "status": "Menunggu",
+        "lat": -7.75797042314246,
+        "lng": 110.40075534790147
+    },
+    {
+        "id": "20260112_092608_1.jpg",
+        "waktu": "2026-01-12 09:26",
+        "lokasi": "Jalan Padjajaran",
+        "gambar": "static/uploads\\20260112_092608_1.jpg",
+        "hasil_ai": "Rusak Ringan",
+        "confidence": 52.599998474121094,
+        "priority_score": 2,
+        "status": "Menunggu",
+        "lat": -7.75780096589118,
+        "lng": 110.39903908967973
+    },
+    {
+        "id": "20260112_092941_1.jpg",
+        "waktu": "2026-01-12 09:29",
+        "lokasi": "Jalan Padjajaran",
+        "gambar": "static/uploads\\20260112_092941_1.jpg",
+        "hasil_ai": "Rusak Ringan",
+        "confidence": 52.599998474121094,
+        "priority_score": 2,
+        "status": "Menunggu",
+        "lat": -7.75780096589118,
+        "lng": 110.39903908967973
+    },
+    {
+        "id": "20260112_093023_1.jpg",
+        "waktu": "2026-01-12 09:30",
+        "lokasi": "Jalan Padjajaran",
+        "gambar": "static/uploads\\20260112_093023_1.jpg",
+        "hasil_ai": "Rusak Ringan",
+        "confidence": 52.599998474121094,
+        "priority_score": 2,
+        "status": "Menunggu",
+        "lat": -7.758300605706674,
+        "lng": 110.40097296237947
+    },
+    {
+        "id": "20260112_094826_waspada-jalan-berlubang-di-jalur-pantura-intai-pengendara-N8eBjPWXLg.jpg",
+        "waktu": "2026-01-12 09:48",
+        "lokasi": "Jalan Magelang",
+        "gambar": "static/uploads\\20260112_094826_waspada-jalan-berlubang-di-jalur-pantura-intai-pengendara-N8eBjPWXLg.jpg",
+        "hasil_ai": "Rusak Berat",
+        "confidence": 59.900001525878906,
+        "priority_score": 3,
+        "status": "Menunggu"
+    },
+    {
+        "id": "20260112_094935_waspada-jalan-berlubang-di-jalur-pantura-intai-pengendara-N8eBjPWXLg.jpg",
+        "waktu": "2026-01-12 09:49",
+        "lokasi": "Jalan Magelang",
+        "gambar": "static/uploads\\20260112_094935_waspada-jalan-berlubang-di-jalur-pantura-intai-pengendara-N8eBjPWXLg.jpg",
+        "hasil_ai": "Rusak Berat",
+        "confidence": 59.900001525878906,
+        "priority_score": 3,
+        "status": "Menunggu"
+    },
+    {
+        "id": "20260112_095028_waspada-jalan-berlubang-di-jalur-pantura-intai-pengendara-N8eBjPWXLg.jpg",
+        "waktu": "2026-01-12 09:50",
+        "lokasi": "Jalan Magelang",
+        "gambar": "static/uploads\\20260112_095028_waspada-jalan-berlubang-di-jalur-pantura-intai-pengendara-N8eBjPWXLg.jpg",
+        "hasil_ai": "Rusak Berat",
+        "confidence": 59.900001525878906,
+        "priority_score": 3,
+        "status": "Menunggu"
+    }
+]

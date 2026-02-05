@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Petugas | City Ops</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root { 
+            --bg-dark: #0b0f19; 
+            --bg-panel: #111827; 
+            --border: #1f2937; 
+            --text: #f3f4f6; 
+            --blue: #3b82f6; 
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .login-card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .brand-section { text-align: center; margin-bottom: 30px; }
+        .brand-icon {
+            width: 48px; height: 48px;
+            background: var(--blue);
+            color: white;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+        .brand-title { font-size: 20px; font-weight: 700; color: white; }
+        .brand-subtitle { font-size: 13px; color: #94a3b8; }
+
+        /* --- PERBAIKAN DI SINI (INPUT FORM) --- */
+        .form-label {
+            color: #e2e8f0; /* Warna label lebih terang/putih */
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control, .input-group-text {
+            /* Background sedikit transparan (Glassy) agar beda dengan BG belakang */
+            background-color: rgba(255, 255, 255, 0.03) !important; 
+            border: 1px solid #334155; /* Garis tepi lebih tegas */
+            color: white !important;
+        }
+
+        /* Icon di sebelah kiri input */
+        .input-group-text {
+            border-right: none;
+            color: #94a3b8; /* Warna icon abu terang */
+        }
+        
+        .form-control {
+            border-left: none;
+            padding: 12px 15px;
+        }
+
+        .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        
+        /* Warna Placeholder */
+        .form-control::placeholder {
+            color: #64748b;
+            opacity: 1;
+        }
+        /* ------------------------------------- */
+
+        .btn-primary {
+            background-color: var(--blue);
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            width: 100%;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .alert-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            font-size: 13px;
+            border-radius: 8px;
+        }
+
+        .back-link { text-align: center; margin-top: 25px; font-size: 13px; }
+        .back-link a { color: #94a3b8; text-decoration: none; transition: 0.2s; }
+        .back-link a:hover { color: var(--blue); }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="brand-section">
+            <div class="brand-icon"><i class="fa-solid fa-chart-simple"></i></div>
+            <div class="brand-title">City Analytics</div>
+            <div class="brand-subtitle">Authorized Government Access Only</div>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-danger d-flex align-items-center">
+            <i class="fa-solid fa-circle-exclamation me-2"></i>
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form action="/login" method="post">
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" name="username" class="form-control" placeholder="Enter ID" required autofocus>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" name="password" class="form-control" placeholder="Enter Password" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Secure Login <i class="fa-solid fa-arrow-right ms-2"></i>
+            </button>
+        </form>
+
+        <div class="back-link">
+            <a href="/"><i class="fa-solid fa-chevron-left me-1"></i> Kembali ke Laporan Warga</a>
+        </div>
+    </div>
+
+</body>
+</html>

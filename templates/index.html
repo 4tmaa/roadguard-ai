@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lapor Jalan | Smart City</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        /* --- TEMA (Sama persis dengan Admin) --- */
+        :root { 
+            /* DEFAULT: DARK MODE */
+            --bg-dark: #0b0f19; 
+            --bg-panel: #111827; 
+            --border: #1f2937; 
+            --text: #f3f4f6; 
+            --text-muted: #9ca3af; 
+            --blue: #3b82f6; 
+            --green: #10b981;
+            --input-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        /* LIGHT MODE */
+        body.light-mode {
+            --bg-dark: #f1f5f9;
+            --bg-panel: #ffffff;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --input-bg: #f8fafc;
+        }
+
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text); 
+            font-family: 'Inter', sans-serif; 
+            transition: 0.3s;
+        }
+
+        /* Container & Card */
+        .main-container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .report-card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Form Inputs */
+        .form-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-control {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .form-control:focus {
+            background-color: var(--input-bg);
+            border-color: var(--blue);
+            color: var(--text);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Map Styling */
+        #mapPicker {
+            height: 300px;
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            z-index: 1;
+            margin-bottom: 5px;
+        }
+
+        /* Button */
+        .btn-submit {
+            background-color: var(--blue);
+            border: none;
+            padding: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            width: 100%;
+            color: white;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+        .btn-submit:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        /* Theme Toggle Button */
+        .btn-theme {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-theme:hover { border-color: var(--blue); color: var(--blue); }
+
+        /* Success Box */
+        .success-box {
+            text-align: center;
+            padding: 20px;
+        }
+        .ai-result {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--green);
+            color: var(--green);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        
+        <div class="header-section">
+            <div class="d-flex align-items-center gap-3">
+                <div style="width: 40px; height: 40px; background: var(--blue); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">
+                    <i class="fa-solid fa-camera"></i>
+                </div>
+                <div>
+                    <h5 class="m-0 fw-bold">Lapor Jalan</h5>
+                    <small style="color: var(--text-muted)">Smart City Public Service</small>
+                </div>
+            </div>
+            
+            <button class="btn-theme" onclick="toggleTheme()" title="Ubah Mode (Siang/Malam)">
+                <i id="themeIcon" class="fa-solid fa-sun"></i>
+            </button>
+        </div>
+
+        <div class="report-card">
+            
+            {% if success %}
+            <div class="success-box">
+                <i class="fa-solid fa-circle-check fa-4x mb-3 text-success"></i>
+                <h3 class="fw-bold">Laporan Terkirim!</h3>
+                <p style="color: var(--text-muted)">Terima kasih. Laporan Anda beserta koordinat lokasi telah masuk ke sistem kami.</p>
+                
+                <div class="ai-result">
+                    <small class="text-uppercase fw-bold opacity-75">Hasil Analisis AI</small>
+                    <h2 class="fw-bold m-0">{{ label }}</h2>
+                </div>
+
+                <a href="/" class="btn btn-outline-secondary w-100 mt-4">Buat Laporan Baru</a>
+            </div>
+
+            {% else %}
+            <form action="/" method="post" enctype="multipart/form-data">
+                
+                <div class="mb-4">
+                    <label class="form-label">
+                        <i class="fa-solid fa-map-pin me-1"></i> Titik Lokasi (Wajib)
+                    </label>
+                    <div id="mapPicker"></div>
+                    <div class="d-flex justify-content-between align-items-center mt-1">
+                        <small style="color: var(--text-muted); font-size: 11px;">
+                            <i class="fa-solid fa-circle-info"></i> Geser pin biru ke posisi lubang jalan yang tepat.
+                        </small>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="getLocation()" style="font-size: 11px;">
+                            <i class="fa-solid fa-location-crosshairs"></i> Lokasi Saya
+                        </button>
+                    </div>
+                    
+                    <input type="hidden" name="latitude" id="latInput">
+                    <input type="hidden" name="longitude" id="lngInput">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Nama Jalan / Patokan</label>
+                    <input type="text" name="lokasi" class="form-control" placeholder="Contoh: Jl. Merdeka No. 45" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Foto Bukti Kerusakan</label>
+                    <input type="file" name="file" class="form-control" accept="image/*" required>
+                    <small style="color: var(--text-muted); font-size: 11px;">Pastikan foto jelas dan terang.</small>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-paper-plane me-2"></i> Kirim Laporan
+                </button>
+            </form>
+            {% endif %}
+
+            <div class="text-center mt-4">
+                <a href="/login" style="font-size: 12px; color: var(--text-muted); text-decoration: none;">Masuk sebagai Petugas</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // --- LOGIKA TEMA (DARK/LIGHT) ---
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
+        
+        // Cek LocalStorage
+        if (localStorage.getItem('theme') === 'light') {
+            body.classList.add('light-mode');
+            if(themeIcon) { themeIcon.classList.replace('fa-sun', 'fa-moon'); }
+        }
+
+        // Variabel Layer Peta (Global agar bisa diakses fungsi toggle)
+        var map, tileLayer;
+        var darkTiles = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+        var lightTiles = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+        function toggleTheme() {
+            body.classList.toggle('light-mode');
+            var isLight = body.classList.contains('light-mode');
+            
+            // Simpan preferensi & Ganti Ikon
+            if (isLight) {
+                localStorage.setItem('theme', 'light');
+                if(themeIcon) themeIcon.classList.replace('fa-sun', 'fa-moon');
+            } else {
+                localStorage.setItem('theme', 'dark');
+                if(themeIcon) themeIcon.classList.replace('fa-moon', 'fa-sun');
+            }
+
+            // Ganti Tile Peta secara realtime jika peta ada
+            if (map && tileLayer) {
+                tileLayer.setUrl(isLight ? lightTiles : darkTiles);
+            }
+        }
+
+        // --- LOGIKA PETA (Hanya dijalankan jika form ada) ---
+        {% if not success %}
+            // 1. Inisialisasi
+            var defaultLat = -6.2088;
+            var defaultLng = 106.8456;
+            var isLightStart = localStorage.getItem('theme') === 'light';
+
+            map = L.map('mapPicker').setView([defaultLat, defaultLng], 13);
+            
+            // 2. Set Tile Awal (Sesuai tema saat load)
+            tileLayer = L.tileLayer(isLightStart ? lightTiles : darkTiles, {
+                attribution: '© CARTO'
+            }).addTo(map);
+
+            // 3. Marker Draggable
+            var marker = L.marker([defaultLat, defaultLng], {draggable: true}).addTo(map);
+
+            // 4. Update Input Hidden
+            function updateInputs(lat, lng) {
+                document.getElementById('latInput').value = lat;
+                document.getElementById('lngInput').value = lng;
+            }
+            updateInputs(defaultLat, defaultLng);
+
+            // Event Geser Marker
+            marker.on('dragend', function(e) {
+                var pos = marker.getLatLng();
+                updateInputs(pos.lat, pos.lng);
+            });
+
+            // Event Klik Peta
+            map.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                updateInputs(e.latlng.lat, e.latlng.lng);
+            });
+
+            // 5. Fungsi GPS
+            function getLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        var lat = position.coords.latitude;
+                        var lng = position.coords.longitude;
+                        map.setView([lat, lng], 16);
+                        marker.setLatLng([lat, lng]);
+                        updateInputs(lat, lng);
+                    });
+                } else {
+                    alert("Browser Anda tidak mendukung Geolocation.");
+                }
+            }
+        {% endif %}
+    </script>
+</body>
+</html>

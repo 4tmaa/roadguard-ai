@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "name": "Alpha Squad",
+        "status": "Available",
+        "contact": "0812-3333-4444"
+    },
+    {
+        "id": 2,
+        "name": "Beta Squad",
+        "status": "Available",
+        "contact": "0812-5555-6666"
+    },
+    {
+        "id": 3,
+        "name": "Gamma Squad",
+        "status": "Busy",
+        "contact": "0812-7777-8888"
+    },
+    {
+        "id": 4,
+        "name": "Delta Force",
+        "status": "Maintenance",
+        "contact": "0812-9999-0000"
+    }
+]

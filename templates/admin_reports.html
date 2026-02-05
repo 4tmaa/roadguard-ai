@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% block title %}Reports Data{% endblock %}
+{% block header_title %}Data Management{% endblock %}
+
+{% block content %}
+<style>
+    /* 1. KARTU & CONTAINER */
+    .custom-card {
+        background-color: var(--bg-panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden; /* Agar sudut tabel tumpul */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header-custom {
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--bg-panel);
+    }
+
+    /* 2. INPUT PENCARIAN */
+    .search-input {
+        background-color: var(--bg-dark); /* Ikut tema */
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 10px 15px;
+        border-radius: 8px;
+        width: 300px;
+        transition: 0.3s;
+    }
+    .search-input:focus {
+        background-color: var(--bg-dark);
+        border-color: var(--blue);
+        color: var(--text);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        outline: none;
+    }
+
+    /* 3. TABEL RESPONSIVE */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        color: var(--text);
+    }
+
+    .custom-table th {
+        text-align: left;
+        padding: 15px 20px;
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border);
+        background-color: var(--bg-panel);
+    }
+
+    .custom-table td {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        vertical-align: middle;
+    }
+
+    .custom-table tr:hover td {
+        background-color: var(--hover-bg); /* Efek hover halus */
+    }
+
+    /* 4. BADGES STATUS */
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .bg-heavy { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+    .bg-medium { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+    .bg-normal { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+    
+    /* Tombol Aksi */
+    .btn-icon {
+        width: 32px; height: 32px;
+        display: inline-flex; align-items: center; justify-content: center;
+        border-radius: 6px;
+        transition: 0.2s;
+        text-decoration: none;
+        margin-right: 5px;
+    }
+    .btn-edit { background: rgba(59, 130, 246, 0.1); color: var(--blue); }
+    .btn-edit:hover { background: var(--blue); color: white; }
+    
+    .btn-done { background: rgba(16, 185, 129, 0.1); color: var(--green); }
+    .btn-done:hover { background: var(--green); color: white; }
+
+</style>
+
+<div class="custom-card">
+    <div class="card-header-custom">
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cari Lokasi atau ID...">
+        
+        <button onclick="exportTableToCSV('laporan_jalan.csv')" class="btn btn-success btn-sm" style="font-weight: 600;">
+            <i class="fa-solid fa-file-csv me-2"></i> Export CSV
+        </button>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="custom-table" id="reportTable">
+            <thead>
+                <tr>
+                    <th>ID Laporan</th>
+                    <th>Waktu Lapor</th>
+                    <th>Lokasi Kejadian</th>
+                    <th>Tingkat Kerusakan</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reports %}
+                <tr>
+                    <td style="font-family: monospace; color: var(--blue);">#{{ r.id.split('_')[2] if r.id.split('_')|length > 2 else r.id[:8] }}</td>
+                    <td style="color: var(--text-muted);">{{ r.waktu }}</td>
+                    <td style="font-weight: 500;">{{ r.lokasi }}</td>
+                    <td>
+                        {% if r.priority_score == 3 %}
+                            <span class="status-badge bg-heavy">Rusak Berat</span>
+                        {% elif r.priority_score == 2 %}
+                            <span class="status-badge bg-medium">Rusak Ringan</span>
+                        {% else %}
+                            <span class="status-badge bg-normal">Normal</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if r.status == 'Selesai' %}
+                            <span style="color: var(--green); font-weight: 600;"><i class="fa-solid fa-check-circle me-1"></i> Selesai</span>
+                        {% elif r.status == 'Sedang Dikerjakan' %}
+                            <span style="color: var(--blue); font-weight: 600;"><i class="fa-solid fa-spinner me-1"></i> Proses</span>
+                        {% else %}
+                            <span style="color: var(--text-muted);">Menunggu</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="/action/{{ r.id }}/proses" class="btn-icon btn-edit" title="Proses Perbaikan">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                        </a>
+                        <a href="/action/{{ r.id }}/selesai" class="btn-icon btn-done" title="Tandai Selesai">
+                            <i class="fa-solid fa-check"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {% if reports|length == 0 %}
+        <div class="text-center py-5" style="color: var(--text-muted);">
+            <i class="fa-regular fa-folder-open fa-3x mb-3 opacity-50"></i>
+            <p>Belum ada data laporan masuk.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 1. FUNGSI FILTER PENCARIAN
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toUpperCase();
+        let rows = document.getElementById('reportTable').getElementsByTagName('tr');
+        
+        // Loop mulai dari 1 (melewati header)
+        for (let i = 1; i < rows.length; i++) {
+            // Cek kolom ID (0), Waktu (1), dan Lokasi (2)
+            let colID = rows[i].getElementsByTagName("td")[0];
+            let colLoc = rows[i].getElementsByTagName("td")[2];
+            
+            if (colID || colLoc) {
+                let txtID = colID.textContent || colID.innerText;
+                let txtLoc = colLoc.textContent || colLoc.innerText;
+                
+                if (txtID.toUpperCase().indexOf(filter) > -1 || txtLoc.toUpperCase().indexOf(filter) > -1) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+    });
+
+    // 2. FUNGSI EXPORT CSV (Disesuaikan agar rapi)
+    function exportTableToCSV(filename) {
+        let csv = [];
+        let rows = document.querySelectorAll("table tr");
+        
+        for (let i = 0; i < rows.length; i++) {
+            // Cek visibilitas baris (hanya export yang tampil hasil filter)
+            if(rows[i].style.display !== 'none'){
+                let row = [], cols = rows[i].querySelectorAll("td, th");
+                
+                // Loop kolom (kecuali kolom terakhir 'Aksi')
+                for (let j = 0; j < cols.length - 1; j++) {
+                    // Bersihkan teks dari spasi berlebih/newline
+                    let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, "").trim();
+                    row.push('"' + data + '"');
+                }
+                csv.push(row.join(","));
+            }
+        }
+
+        let csvFile = new Blob([csv.join("\n")], {type: "text/csv"});
+        let downloadLink = document.createElement("a");
+        downloadLink.download = filename;
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+    }
+</script>
+{% endblock %}

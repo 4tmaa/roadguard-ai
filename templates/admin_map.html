@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Live Map{% endblock %}
+{% block header_title %}Geospatial View{% endblock %}
+
+{% block content %}
+<div id="fullMap" style="height: 80vh; border-radius: 12px; border: 1px solid var(--border); z-index: 1;"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 1. Inisialisasi Peta
+    var map = L.map('fullMap').setView([-6.2088, 106.8456], 13);
+
+    // 2. Definisi URL Tile (Gelap & Terang)
+    var darkTiles = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+    var lightTiles = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+    // 3. Cek Tema Saat Ini (Saat halaman pertama kali dibuka)
+    var isLight = document.body.classList.contains('light-mode') || localStorage.getItem('theme') === 'light';
+    var activeTileUrl = isLight ? lightTiles : darkTiles;
+
+    // 4. Tambahkan Tile Layer ke Peta
+    var tileLayer = L.tileLayer(activeTileUrl, {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(map);
+
+    // 5. Render Marker Laporan
+    var reports = {{ reports | tojson }};
+    reports.forEach(r => {
+        let color = '#3b82f6'; // Default Blue
+        if (r.priority_score == 3) color = '#ef4444'; // Red
+        else if (r.priority_score == 2) color = '#f59e0b'; // Orange
+
+        // Menggunakan CircleMarker agar terlihat rapi
+        L.circleMarker([r.lat, r.lng], {
+            color: color, 
+            fillColor: color,
+            fillOpacity: 0.8,
+            radius: 8
+        })
+        .bindPopup(`
+            <div style="font-family: 'Inter', sans-serif; color: #333;">
+                <b style="font-size:14px;">${r.lokasi}</b><br>
+                <span style="font-size:12px; color: #666;">AI: ${r.hasil_ai}</span><br>
+                <a href="${r.gambar}" target="_blank" style="font-size:12px; color: #3b82f6;">Lihat Foto</a>
+            </div>
+        `)
+        .addTo(map);
+    });
+
+    // 6. LOGIKA REALTIME (Agar peta berubah saat tombol di navbar diklik)
+    // Kita mencari tombol toggle theme di base.html lalu pasang 'telinga' (event listener)
+    var themeBtn = document.querySelector('button[onclick="toggleTheme()"]');
+    if(themeBtn){
+        themeBtn.addEventListener('click', function() {
+            // Beri jeda sedikit agar class 'light-mode' di body sempat berubah
+            setTimeout(() => {
+                var isNowLight = document.body.classList.contains('light-mode');
+                // Ganti sumber gambar peta tanpa reload halaman
+                tileLayer.setUrl(isNowLight ? lightTiles : darkTiles);
+            }, 50);
+        });
+    }
+</script>
+{% endblock %}

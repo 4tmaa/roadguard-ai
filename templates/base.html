@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Ops | {% block title %}{% endblock %}</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        /* --- 1. DEFINISI WARNA (THEMING ENGINE) --- */
+        :root { 
+            /* DEFAULT: DARK MODE */
+            --bg-dark: #0b0f19; 
+            --bg-panel: #111827; 
+            --border: #1f2937; 
+            --text: #f3f4f6; 
+            --text-muted: #9ca3af; 
+            --hover-bg: rgba(255,255,255,0.05);
+            
+            /* Warna Aksen (Tetap sama di kedua mode) */
+            --blue: #3b82f6; 
+            --red: #ef4444; 
+            --green: #10b981; 
+            --yellow: #f59e0b; 
+        }
+
+        /* LIGHT MODE OVERRIDE (Akan aktif jika body punya class 'light-mode') */
+        body.light-mode {
+            --bg-dark: #f1f5f9;       /* Abu-abu sangat muda (latar utama) */
+            --bg-panel: #ffffff;      /* Putih bersih (kartu/sidebar) */
+            --border: #e2e8f0;        /* Garis abu terang */
+            --text: #0f172a;          /* Hitam kebiruan (teks utama) */
+            --text-muted: #64748b;    /* Abu medium */
+            --hover-bg: rgba(0,0,0,0.05);
+        }
+
+        /* --- 2. GLOBAL STYLES --- */
+        body { 
+            background: var(--bg-dark); 
+            color: var(--text); 
+            font-family: 'Inter', sans-serif; 
+            overflow-x: hidden; 
+            transition: background-color 0.3s, color 0.3s; /* Efek transisi halus */
+        }
+        
+        .wrapper { display: flex; height: 100vh; width: 100%; }
+        
+        /* Sidebar */
+        .sidebar { 
+            width: 260px; 
+            background: var(--bg-panel); 
+            border-right: 1px solid var(--border); 
+            padding: 20px; 
+            flex-shrink: 0; 
+            display: flex; flex-direction: column; 
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .sidebar-brand { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
+        .nav-item { color: var(--text-muted); padding: 12px; text-decoration: none; display: flex; gap: 12px; border-radius: 8px; margin-bottom: 5px; transition: 0.2s; font-size: 14px; font-weight: 500; }
+        .nav-item:hover, .nav-item.active { background: rgba(59, 130, 246, 0.1); color: var(--blue); }
+        
+        /* Main Content */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .top-header { 
+            height: 70px; 
+            background: var(--bg-panel); 
+            border-bottom: 1px solid var(--border); 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 30px; 
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .content-scroll { padding: 20px; overflow-y: auto; flex: 1; }
+        
+        /* Dropdown Styles (Adaptive) */
+        .dropdown-menu {
+            background-color: var(--bg-panel) !important;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .dropdown-item {
+            color: var(--text) !important;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .dropdown-item:hover { background-color: var(--hover-bg) !important; }
+        .dropdown-header { color: var(--text-muted) !important; font-weight: 600; }
+        
+        /* Notif Text Colors */
+        .notif-title { color: var(--red) !important; font-weight: bold; }
+        .notif-sub { color: var(--text) !important; opacity: 0.8; }
+        .notif-time { color: var(--text-muted) !important; font-size: 10px; }
+        
+        /* Icons Hover */
+        .hover-icon { color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+        .hover-icon:hover { color: var(--text); }
+        
+        /* Judul Header */
+        .header-title { color: var(--text); margin: 0; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fa-solid fa-chart-simple text-primary"></i> City Analytics
+            </div>
+            <nav>
+                <a href="/admin" class="nav-item {% if page=='dashboard' %}active{% endif %}"><i class="fa-solid fa-grip"></i> Dashboard</a>
+                <a href="/admin/map" class="nav-item {% if page=='map' %}active{% endif %}"><i class="fa-solid fa-map"></i> Map Assets</a>
+                <a href="/admin/reports" class="nav-item {% if page=='reports' %}active{% endif %}"><i class="fa-solid fa-file-invoice"></i> Reports</a>
+                <a href="/admin/teams" class="nav-item {% if page=='teams' %}active{% endif %}"><i class="fa-solid fa-people-group"></i> Team Mgmt</a>
+            </nav>
+            <div class="mt-auto">
+                <a href="/logout" class="nav-item text-danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-header">
+                <h5 class="header-title">{% block header_title %}Overview{% endblock %}</h5>
+                
+                <div class="d-flex align-items-center gap-3">
+                    
+                    <button class="btn border-0" onclick="toggleTheme()" data-bs-toggle="tooltip" title="Switch Theme">
+                        <i id="themeIcon" class="fa-solid fa-sun fa-lg hover-icon"></i> 
+                    </button>
+
+                    <div style="width: 1px; height: 24px; background: var(--border);"></div>
+
+                    {% set ns = namespace(critical_count=0) %}
+                    {% if reports is defined %}
+                        {% for r in reports %}
+                            {% if r.priority_score == 3 and r.status != 'Selesai' %}
+                                {% set ns.critical_count = ns.critical_count + 1 %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="dropdown">
+                        <button class="btn border-0 position-relative" data-bs-toggle="dropdown">
+                            <i class="fa-regular fa-bell fa-lg hover-icon"></i>
+                            {% if ns.critical_count > 0 %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">
+                                {{ ns.critical_count }}
+                            </span>
+                            {% endif %}
+                        </button>
+                        
+                        <ul class="dropdown-menu dropdown-menu-end" style="width: 320px;">
+                            <li><h6 class="dropdown-header text-uppercase small">System Alerts</h6></li>
+                            {% if ns.critical_count > 0 %}
+                                {% for r in reports %}
+                                    {% if r.priority_score == 3 and r.status != 'Selesai' %}
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-start gap-2" href="/admin/reports">
+                                            <i class="fa-solid fa-circle-exclamation text-danger mt-1"></i>
+                                            <div>
+                                                <div class="notif-title">Critical: {{ r.hasil_ai }}</div>
+                                                <div class="notif-sub" style="font-size: 11px;">{{ r.lokasi }}</div>
+                                                <div class="notif-time">{{ r.waktu }}</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <li><div class="dropdown-item text-center text-muted py-3">No active alerts</div></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    <a href="/admin/settings" class="btn border-0" data-bs-toggle="tooltip" title="Settings">
+                         <i class="fa-solid fa-gear fa-lg hover-icon {% if page=='settings' %}text-primary{% endif %}"></i>
+                    </a>
+
+                </div>
+            </div>
+
+            <div class="content-scroll">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // Init Tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
+        // --- FITUR MODE GELAP/TERANG ---
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
+
+        // 1. Cek LocalStorage saat halaman dimuat
+        if (localStorage.getItem('theme') === 'light') {
+            body.classList.add('light-mode');
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon'); // Ganti ikon jadi bulan
+        }
+
+        // 2. Fungsi Toggle
+        function toggleTheme() {
+            body.classList.toggle('light-mode');
+            
+            if (body.classList.contains('light-mode')) {
+                // Masuk Mode Terang
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            } else {
+                // Masuk Mode Gelap
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+        }
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>
