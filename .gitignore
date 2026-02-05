@@ -115,6 +115,5 @@ dmypy.json
 # OS Specific
 .DS_Store
 Thumbs.db*
-*.h5
 
 
